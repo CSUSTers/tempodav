@@ -7,7 +7,11 @@ edition = "2021"
 
 [dependencies]
 anyhow = "1.0.72"
-axum = { version = "0.6.20", features = ["headers", "http2"] }
+axum = { version = "0.6.20", features = ["headers", "http2", "macros"] }
+base64 = "0.21.2"
 dav-server = { version = "0.5.7", features = ["hyper"] }
 futures-util = "0.3.28"
 lazy_static = "1.4.0"
+tokio = { version = "1.29.1", features = ["sync", "test-util", "macros"] }
+tokio-util = { version = "0.7.8", features = ["full"] }
+tower = "0.4.13"
