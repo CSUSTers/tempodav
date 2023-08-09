@@ -1,0 +1,25 @@
+{
+    "image": "mcr.microsoft.com/devcontainers/universal",
+    "features": {
+        "ghcr.io/devcontainers/features/common-utils:2": {},
+        "ghcr.io/devcontainers/features/rust:1": {
+            "version": "nightly-2023-08-08",
+            "profile": "default"
+        },
+        "ghcr.io/eitsupi/devcontainer-features/jq-likes:1": {}
+    },
+    "customizations": {
+        "vscode": {
+			"settings": {
+                "gitlens.showWelcomeOnInstall": false,
+                "gitlens.showWhatsNewAfterUpgrades": false
+            },
+			"extensions": [
+                "eamodio.gitlens",
+                // "tuttieee.emacs-mcx",
+                "esbenp.prettier-vscode",
+                "alexcvzz.vscode-sqlite"
+            ]
+		}
+    }
+}

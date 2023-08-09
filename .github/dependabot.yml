@@ -1,0 +1,16 @@
+version: 2
+updates:
+  - package-ecosystem: "cargo" # See documentation for possible values
+    directory: "/dav" # Location of package manifests
+    schedule:
+      interval: "daily"
+
+  - package-ecosystem: "cargo"
+    directory: "/src-tauri"
+    schedule:
+      interval: "daily"
+
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "daily"
