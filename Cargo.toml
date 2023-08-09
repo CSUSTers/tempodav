@@ -1,0 +1,12 @@
+[workspace]
+default-members = ["dav"]
+members = ["src-tauri", "dav"]
+resolver = "2"
+
+[profile.release]
+lto = true
+opt-level = 3
+debug = false
+codegen-units = 1
+panic = "abort"
+overflow-checks = true
