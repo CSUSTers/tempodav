@@ -10,6 +10,9 @@ use axum::{
 };
 use dav_server::{fakels::FakeLs, localfs::LocalFs};
 use tower::service_fn;
+use utils::WithProcedure;
+
+pub mod utils;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct DavConfig {
@@ -139,10 +142,13 @@ impl DavServer {
                     async move { Ok(dav_service_handler.handle(req).await) }
                 }),
             )
-            .route_layer(axum::middleware::from_fn_with_state(
-                account,
-                http_basic_authorize_middleware,
-            ));
+            .with(|r| match account {
+                None => r,
+                Some(account) => r.route_layer(axum::middleware::from_fn_with_state(
+                    account,
+                    http_basic_authorize_middleware,
+                )),
+            });
 
         axum::Server::bind(&self.config.bind)
             .serve(dav_router.into_make_service())
@@ -164,24 +170,19 @@ impl Account {
 }
 
 async fn http_basic_authorize_middleware<B>(
-    State(account): State<Option<Account>>,
+    State(account): State<Account>,
     TypedHeader(auth): TypedHeader<Authorization<axum::headers::authorization::Basic>>,
     req: Request<B>,
     next: Next<B>,
 ) -> Response {
     let req_user = auth.username();
     let req_password = auth.password();
-    println!("user: {:?}, password: {:?}", req_user, req_password);
 
-    match account {
-        Some(Account { user, password }) => {
-            if user == req_user && password == req_password {
-                next.run(req).await
-            } else {
-                (StatusCode::UNAUTHORIZED, "Unauthorized").into_response()
-            }
-        }
-        None => next.run(req).await,
+    let Account { user, password } = account;
+    if user == req_user && password == req_password {
+        next.run(req).await
+    } else {
+        (StatusCode::UNAUTHORIZED, "Unauthorized").into_response()
     }
 }
 
