@@ -123,10 +123,10 @@ impl TlsCert {
                 }
                 // TODO: check cert validity
                 Ok(())
-            },
+            }
             TlsCert::CertFile { cert, key } => {
                 let cert_path = std::path::Path::new(cert);
-                let key_path =  std::path::Path::new(key);
+                let key_path = std::path::Path::new(key);
                 if !cert_path.exists() || !key_path.exists() {
                     return Err("TLS certificate or key file does not exist".to_string());
                 };
@@ -146,6 +146,26 @@ struct ServerHandler {
 struct State {
     config: Mutex<Config>,
     server_handler: Mutex<Option<ServerHandler>>,
+}
+
+#[tauri::command]
+fn get_config(state: tauri::State<State>) -> Config {
+    state.config.lock().clone().with_mut(|c| {
+        if c.enable_tls && c.tls_cert.is_none() {
+            cert_key_path()
+                .and_then(|(cert_path, key_path)| {
+                    c.tls_cert = Some(TlsCert::CertFile {
+                        cert: cert_path,
+                        key: key_path,
+                    });
+                    Ok(())
+                })
+                .or_else(|e| {
+                    eprintln!("Failed to get cert/key path: {}", e);
+                    Err(())
+                }).unwrap_or(());
+        }
+    })
 }
 
 #[tauri::command]
@@ -214,7 +234,10 @@ fn start_dav_server(state: tauri::State<State>) -> Result<(), String> {
         dav_server = dav_server.authorization(user.clone(), password.clone());
     }
     if config.enable_tls {
-        match &config.tls_cert.unwrap_or_else(TlsCert::use_app_default_path) {
+        match &config
+            .tls_cert
+            .unwrap_or_else(TlsCert::use_app_default_path)
+        {
             TlsCert::Cert { cert, key } => {
                 dav_server = dav_server.tls(TlsConfig::pem(cert.clone(), key.clone()));
             }
@@ -284,6 +307,7 @@ fn main() {
         //     Ok(())
         // })
         .invoke_handler(tauri::generate_handler![
+            get_config,
             update_config,
             import_tls_or_cert_from_path,
             start_dav_server,
