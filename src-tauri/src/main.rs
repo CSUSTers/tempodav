@@ -12,8 +12,10 @@ use serde::{Deserialize, Serialize};
 
 mod cert;
 use cert::*;
+use tauri::Manager;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 struct Config {
     ip: Option<String>,
     port: Option<u16>,
@@ -21,7 +23,7 @@ struct Config {
     auth: Option<(String, String)>,
 
     enable_tls: bool,
-    #[serde(skip)]
+    #[serde(skip_deserializing, skip_serializing_if = "Option::is_none")]
     tls_cert: Option<TlsCert>,
 }
 
@@ -62,39 +64,77 @@ impl Config {
             }
         }
 
-        if self.enable_tls {
-            if let Some(cert) = &self.tls_cert {
-                match cert {
-                    TlsCert::Cert { cert, key } => {
-                        if cert.is_empty() {
-                            return Err("TLS certificate is not set".to_string());
-                        }
-                        if key.is_empty() {
-                            return Err("TLS key is not set".to_string());
-                        }
-                    }
-                    TlsCert::CertFile { cert, key } => {
-                        if !std::path::Path::new(&cert).exists() {
-                            return Err("TLS certificate file does not exist".to_string());
-                        };
-                        if !std::path::Path::new(&key).exists() {
-                            return Err("TLS key file does not exist".to_string());
-                        };
-                    }
-                }
-            } else {
-                return Err("TLS certificate is not set".to_string());
-            }
-        }
+        // if self.enable_tls {
+        //     if let Some(cert) = &self.tls_cert {
+        //         match cert {
+        //             TlsCert::Cert { cert, key } => {
+        //                 if cert.is_empty() {
+        //                     return Err("TLS certificate is not set".to_string());
+        //                 }
+        //                 if key.is_empty() {
+        //                     return Err("TLS key is not set".to_string());
+        //                 }
+        //             }
+        //             TlsCert::CertFile { cert, key } => {
+        //                 if !std::path::Path::new(&cert).exists() {
+        //                     return Err("TLS certificate file does not exist".to_string());
+        //                 };
+        //                 if !std::path::Path::new(&key).exists() {
+        //                     return Err("TLS key file does not exist".to_string());
+        //                 };
+        //             }
+        //         }
+        //     } else {
+        //         return Err("TLS certificate is not set".to_string());
+        //     }
+        // }
 
         Ok(())
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize)]
 enum TlsCert {
-    Cert { cert: Vec<u8>, key: Vec<u8> },
-    CertFile { cert: String, key: String },
+    #[serde(skip_serializing)]
+    Cert {
+        cert: Vec<u8>,
+        key: Vec<u8>,
+    },
+    CertFile {
+        cert: String,
+        key: String,
+    },
+}
+
+impl TlsCert {
+    fn use_app_default_path() -> Self {
+        let (cert_path, key_path) = cert_key_path().expect("Failed to get cert/key path");
+        TlsCert::CertFile {
+            cert: cert_path,
+            key: key_path,
+        }
+    }
+
+    fn check_cert_available(&self) -> Result<(), String> {
+        match self {
+            TlsCert::Cert { cert, key } => {
+                if cert.is_empty() || key.is_empty() {
+                    return Err("TLS certificate or key is not set".to_string());
+                }
+                // TODO: check cert validity
+                Ok(())
+            },
+            TlsCert::CertFile { cert, key } => {
+                let cert_path = std::path::Path::new(cert);
+                let key_path =  std::path::Path::new(key);
+                if !cert_path.exists() || !key_path.exists() {
+                    return Err("TLS certificate or key file does not exist".to_string());
+                };
+                // TODO: check cert validity
+                Ok(())
+            }
+        }
+    }
 }
 
 #[derive(Debug)]
@@ -174,16 +214,15 @@ fn start_dav_server(state: tauri::State<State>) -> Result<(), String> {
         dav_server = dav_server.authorization(user.clone(), password.clone());
     }
     if config.enable_tls {
-        match &config.tls_cert {
-            Some(TlsCert::Cert { cert, key }) => {
+        match &config.tls_cert.unwrap_or_else(TlsCert::use_app_default_path) {
+            TlsCert::Cert { cert, key } => {
                 dav_server = dav_server.tls(TlsConfig::pem(cert.clone(), key.clone()));
             }
-            Some(TlsCert::CertFile { cert, key }) => {
+            TlsCert::CertFile { cert, key } => {
                 let cert_bytes = std::fs::read(cert).map_err(|e| e.to_string())?;
                 let key_bytes = std::fs::read(key).map_err(|e| e.to_string())?;
                 dav_server = dav_server.tls(TlsConfig::pem(cert_bytes, key_bytes));
             }
-            None => return Err("TLS certificate is not set".to_string()),
         }
     }
 
@@ -210,6 +249,29 @@ fn stop_dav_server(state: tauri::State<State>) -> Result<(), String> {
     Ok(())
 }
 
+#[derive(Debug, Clone, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+enum DavServerStatus {
+    Running,
+    Stopped,
+}
+
+#[tauri::command]
+fn check_dav_server(state: tauri::State<State>) -> Result<DavServerStatus, String> {
+    let handler_guard = state.server_handler.lock();
+    match handler_guard.as_ref() {
+        Some(hander) => {
+            if hander.handle.is_finished() {
+                Ok(DavServerStatus::Stopped)
+            } else {
+                Ok(DavServerStatus::Running)
+            }
+        }
+        None => Ok(DavServerStatus::Stopped),
+    }
+}
+
 fn main() {
     let config = Config::default();
     let state = State {
@@ -217,11 +279,16 @@ fn main() {
         server_handler: Mutex::new(None),
     };
     tauri::Builder::default()
+        // .setup(|app| {
+        //     let main = app.get_window("main").expect("main window not found");
+        //     Ok(())
+        // })
         .invoke_handler(tauri::generate_handler![
             update_config,
             import_tls_or_cert_from_path,
             start_dav_server,
             stop_dav_server,
+            check_dav_server,
         ])
         .manage(state)
         .run(tauri::generate_context!())
