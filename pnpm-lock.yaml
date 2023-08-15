@@ -12,19 +12,19 @@ dependencies:
     specifier: ^1.4.0
     version: 1.4.0
   preact:
-    specifier: ^10.16.0
-    version: 10.16.0
+    specifier: ^10.17.0
+    version: 10.17.0
   react:
     specifier: npm:@preact/compat
-    version: /@preact/compat@17.1.2(preact@10.16.0)
+    version: /@preact/compat@17.1.2(preact@10.17.0)
   react-dom:
     specifier: npm:@preact/compat
-    version: /@preact/compat@17.1.2(preact@10.16.0)
+    version: /@preact/compat@17.1.2(preact@10.17.0)
 
 devDependencies:
   '@preact/preset-vite':
     specifier: ^2.5.0
-    version: 2.5.0(@babel/core@7.22.10)(preact@10.16.0)(vite@4.4.4)
+    version: 2.5.0(@babel/core@7.22.10)(preact@10.17.0)(vite@4.4.4)
   '@tauri-apps/cli':
     specifier: ^1.4.0
     version: 1.4.0
@@ -574,7 +574,7 @@ packages:
       '@fluentui/style-utilities': 8.9.16(@preact/compat@17.1.2)(@types/react@18.2.19)
       '@fluentui/utilities': 8.13.18(@preact/compat@17.1.2)(@types/react@18.2.19)
       '@types/react': 18.2.19
-      react: /@preact/compat@17.1.2(preact@10.16.0)
+      react: /@preact/compat@17.1.2(preact@10.17.0)
       tslib: 2.6.1
     dev: false
 
@@ -603,7 +603,7 @@ packages:
       '@fluentui/style-utilities': 8.9.16(@preact/compat@17.1.2)(@types/react@18.2.19)
       '@fluentui/utilities': 8.13.18(@preact/compat@17.1.2)(@types/react@18.2.19)
       '@types/react': 18.2.19
-      react: /@preact/compat@17.1.2(preact@10.16.0)
+      react: /@preact/compat@17.1.2(preact@10.17.0)
       tslib: 2.6.1
     dev: false
 
@@ -617,7 +617,7 @@ packages:
       '@fluentui/set-version': 8.2.11
       '@fluentui/utilities': 8.13.18(@preact/compat@17.1.2)(@types/react@18.2.19)
       '@types/react': 18.2.19
-      react: /@preact/compat@17.1.2(preact@10.16.0)
+      react: /@preact/compat@17.1.2(preact@10.17.0)
       tslib: 2.6.1
     dev: false
 
@@ -629,7 +629,7 @@ packages:
     dependencies:
       '@swc/helpers': 0.4.14
       '@types/react': 18.2.19
-      react: /@preact/compat@17.1.2(preact@10.16.0)
+      react: /@preact/compat@17.1.2(preact@10.17.0)
     dev: false
 
   /@fluentui/react-window-provider@2.2.15(@preact/compat@17.1.2)(@types/react@18.2.19):
@@ -640,7 +640,7 @@ packages:
     dependencies:
       '@fluentui/set-version': 8.2.11
       '@types/react': 18.2.19
-      react: /@preact/compat@17.1.2(preact@10.16.0)
+      react: /@preact/compat@17.1.2(preact@10.17.0)
       tslib: 2.6.1
     dev: false
 
@@ -667,8 +667,8 @@ packages:
       '@microsoft/load-themed-styles': 1.10.295
       '@types/react': 18.2.19
       '@types/react-dom': 18.2.7
-      react: /@preact/compat@17.1.2(preact@10.16.0)
-      react-dom: /@preact/compat@17.1.2(preact@10.16.0)
+      react: /@preact/compat@17.1.2(preact@10.17.0)
+      react-dom: /@preact/compat@17.1.2(preact@10.17.0)
       tslib: 2.6.1
     dev: false
 
@@ -702,7 +702,7 @@ packages:
       '@fluentui/set-version': 8.2.11
       '@fluentui/utilities': 8.13.18(@preact/compat@17.1.2)(@types/react@18.2.19)
       '@types/react': 18.2.19
-      react: /@preact/compat@17.1.2(preact@10.16.0)
+      react: /@preact/compat@17.1.2(preact@10.17.0)
       tslib: 2.6.1
     dev: false
 
@@ -716,7 +716,7 @@ packages:
       '@fluentui/merge-styles': 8.5.12
       '@fluentui/set-version': 8.2.11
       '@types/react': 18.2.19
-      react: /@preact/compat@17.1.2(preact@10.16.0)
+      react: /@preact/compat@17.1.2(preact@10.17.0)
       tslib: 2.6.1
     dev: false
 
@@ -795,15 +795,15 @@ packages:
       fastq: 1.15.0
     dev: true
 
-  /@preact/compat@17.1.2(preact@10.16.0):
+  /@preact/compat@17.1.2(preact@10.17.0):
     resolution: {integrity: sha512-7pOZN9lMDDRQ+6aWvjwTp483KR8/zOpfS83wmOo3zfuLKdngS8/5RLbsFWzFZMGdYlotAhX980hJ75bjOHTwWg==}
     peerDependencies:
       preact: '*'
     dependencies:
-      preact: 10.16.0
+      preact: 10.17.0
     dev: false
 
-  /@preact/preset-vite@2.5.0(@babel/core@7.22.10)(preact@10.16.0)(vite@4.4.4):
+  /@preact/preset-vite@2.5.0(@babel/core@7.22.10)(preact@10.17.0)(vite@4.4.4):
     resolution: {integrity: sha512-BUhfB2xQ6ex0yPkrT1Z3LbfPzjpJecOZwQ/xJrXGFSZD84+ObyS//41RdEoQCMWsM0t7UHGaujUxUBub7WM1Jw==}
     peerDependencies:
       '@babel/core': 7.x
@@ -812,7 +812,7 @@ packages:
       '@babel/core': 7.22.10
       '@babel/plugin-transform-react-jsx': 7.22.5(@babel/core@7.22.10)
       '@babel/plugin-transform-react-jsx-development': 7.22.5(@babel/core@7.22.10)
-      '@prefresh/vite': 2.4.1(preact@10.16.0)(vite@4.4.4)
+      '@prefresh/vite': 2.4.1(preact@10.17.0)(vite@4.4.4)
       '@rollup/pluginutils': 4.2.1
       babel-plugin-transform-hook-names: 1.0.2(@babel/core@7.22.10)
       debug: 4.3.4
@@ -828,19 +828,19 @@ packages:
     resolution: {integrity: sha512-joAwpkUDwo7ZqJnufXRGzUb+udk20RBgfA8oLPBh5aJH2LeStmV1luBfeJTztPdyCscC2j2SmZ/tVxFRMIxAEw==}
     dev: true
 
-  /@prefresh/core@1.5.1(preact@10.16.0):
+  /@prefresh/core@1.5.1(preact@10.17.0):
     resolution: {integrity: sha512-e0mB0Oxtog6ZpKPDBYbzFniFJDIktuKMzOHp7sguntU+ot0yi6dbhJRE9Css1qf0u16wdSZjpL2W2ODWuU05Cw==}
     peerDependencies:
       preact: ^10.0.0
     dependencies:
-      preact: 10.16.0
+      preact: 10.17.0
     dev: true
 
   /@prefresh/utils@1.2.0:
     resolution: {integrity: sha512-KtC/fZw+oqtwOLUFM9UtiitB0JsVX0zLKNyRTA332sqREqSALIIQQxdUCS1P3xR/jT1e2e8/5rwH6gdcMLEmsQ==}
     dev: true
 
-  /@prefresh/vite@2.4.1(preact@10.16.0)(vite@4.4.4):
+  /@prefresh/vite@2.4.1(preact@10.17.0)(vite@4.4.4):
     resolution: {integrity: sha512-vthWmEqu8TZFeyrBNc9YE5SiC3DVSzPgsOCp/WQ7FqdHpOIJi7Z8XvCK06rBPOtG4914S52MjG9Ls22eVAiuqQ==}
     peerDependencies:
       preact: ^10.4.0
@@ -848,10 +848,10 @@ packages:
     dependencies:
       '@babel/core': 7.22.10
       '@prefresh/babel-plugin': 0.5.0
-      '@prefresh/core': 1.5.1(preact@10.16.0)
+      '@prefresh/core': 1.5.1(preact@10.17.0)
       '@prefresh/utils': 1.2.0
       '@rollup/pluginutils': 4.2.1
-      preact: 10.16.0
+      preact: 10.17.0
       vite: 4.4.4
     transitivePeerDependencies:
       - supports-color
@@ -1897,8 +1897,8 @@ packages:
       source-map-js: 1.0.2
     dev: true
 
-  /preact@10.16.0:
-    resolution: {integrity: sha512-XTSj3dJ4roKIC93pald6rWuB2qQJO9gO2iLLyTe87MrjQN+HklueLsmskbywEWqCHlclgz3/M4YLL2iBr9UmMA==}
+  /preact@10.17.0:
+    resolution: {integrity: sha512-SNsI8cbaCcUS5tbv9nlXuCfIXnJ9ysBMWk0WnB6UWwcVA3qZ2O6FxqDFECMAMttvLQcW/HaNZUe2BLidyvrVYw==}
 
   /prelude-ls@1.2.1:
     resolution: {integrity: sha512-vkcDPrRZo1QZLbn5RLGPpg/WmIQ65qoWWhcGKf/b5eplkkarX0m9z8ppCat4mlOqUsWpyNuYgO3VRyrYHSzX5g==}
