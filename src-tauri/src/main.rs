@@ -10,6 +10,7 @@ use serde::{Deserialize, Serialize};
 mod cert;
 use cert::*;
 use tauri::Manager;
+use window_vibrancy::NSVisualEffectMaterial;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -325,7 +326,7 @@ fn main() {
         .setup(|app| {
             let main = app.get_window("main").expect("main window not found");
 
-            #[cfg(all(target_os = "macos", feature = "tauri/macos-private-api"))]
+            #[cfg(all(target_os = "macos"))]
             {
                 use window_vibrancy::apply_vibrancy;
                 apply_vibrancy(&main, NSVisualEffectMaterial::HudWindow, None, None)
