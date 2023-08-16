@@ -257,7 +257,7 @@ fn start_dav_server(state: tauri::State<State>) -> Result<(), String> {
 
     let mut rt_guard = state.tokio_runtime.lock();
     let rt = rt_guard.get_or_insert({
-        let rt = tokio::runtime::Builder::new_current_thread()
+        let rt = tokio::runtime::Builder::new_multi_thread()
             .enable_all()
             .build()
             .expect("Failed to build tokio runtime");
