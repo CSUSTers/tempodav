@@ -325,7 +325,7 @@ fn main() {
         .setup(|app| {
             let main = app.get_window("main").expect("main window not found");
 
-            #[cfg(all(target_os = "macos"))]
+            #[cfg(all(target_os = "macos", feature = "tauri/macos-private-api"))]
             {
                 use window_vibrancy::{apply_vibrancy, NSVisualEffectMaterial};
                 apply_vibrancy(&main, NSVisualEffectMaterial::HudWindow, None, None)
