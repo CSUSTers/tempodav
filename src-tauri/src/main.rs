@@ -10,7 +10,6 @@ use serde::{Deserialize, Serialize};
 mod cert;
 use cert::*;
 use tauri::Manager;
-use window_vibrancy::NSVisualEffectMaterial;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -328,7 +327,7 @@ fn main() {
 
             #[cfg(all(target_os = "macos"))]
             {
-                use window_vibrancy::apply_vibrancy;
+                use window_vibrancy::{apply_vibrancy, NSVisualEffectMaterial};
                 apply_vibrancy(&main, NSVisualEffectMaterial::HudWindow, None, None)
                     .expect("Unsupported platform! 'apply_vibrancy' is only supported on macOS");
             }
