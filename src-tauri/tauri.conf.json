@@ -40,7 +40,7 @@
       {
         "fullscreen": false,
         "resizable": true,
-        "title": "tauri-app",
+        "title": "TempoDAV",
         "width": 800,
         "height": 600
       }

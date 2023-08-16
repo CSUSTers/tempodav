@@ -11,17 +11,21 @@
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0"
   },
   "dependencies": {
-    "@fluentui/react": "^8.110.13",
+    "@fluentui/react-components": "^9.28.0",
+    "@fluentui/react-icons": "^2.0.210",
     "@tauri-apps/api": "^1.4.0",
-    "preact": "^10.16.0",
-    "react": "npm:@preact/compat",
-    "react-dom": "npm:@preact/compat"
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.15.0",
+    "zustand": "^4.4.1"
   },
   "devDependencies": {
-    "@preact/preset-vite": "^2.5.0",
     "@tauri-apps/cli": "^1.4.0",
+    "@types/react": "^18.2.20",
+    "@types/react-dom": "^18.2.7",
     "@typescript-eslint/eslint-plugin": "^6.3.0",
     "@typescript-eslint/parser": "^6.3.0",
+    "@vitejs/plugin-react": "^4.0.4",
     "eslint": "^8.46.0",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.3",

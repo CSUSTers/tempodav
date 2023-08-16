@@ -1,12 +1,9 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-use std::net::{IpAddr, Ipv4Addr, Ipv6Addr, SocketAddr};
+use std::net::{IpAddr, Ipv6Addr};
 
-use dav::{
-    utils::{WithMutProcedure, WithProcedure},
-    TlsConfig,
-};
+use dav::{utils::WithMutProcedure, TlsConfig};
 use parking_lot::Mutex;
 use serde::{Deserialize, Serialize};
 
@@ -48,7 +45,7 @@ impl Config {
 
     fn validate(&self) -> Result<(), String> {
         if let Some(ip) = &self.ip {
-            if ip.parse::<SocketAddr>().is_err() {
+            if ip.parse::<IpAddr>().is_err() {
                 return Err("Invalid IP address".to_string());
             }
         }
@@ -144,6 +141,7 @@ struct ServerHandler {
 
 #[derive(Debug)]
 struct State {
+    tokio_runtime: Mutex<Option<tokio::runtime::Runtime>>,
     config: Mutex<Config>,
     server_handler: Mutex<Option<ServerHandler>>,
 }
@@ -163,7 +161,8 @@ fn get_config(state: tauri::State<State>) -> Config {
                 .or_else(|e| {
                     eprintln!("Failed to get cert/key path: {}", e);
                     Err(())
-                }).unwrap_or(());
+                })
+                .unwrap_or(());
         }
     })
 }
@@ -180,7 +179,7 @@ fn update_config(state: tauri::State<State>, mut config: Config) -> Result<(), S
 
 #[tauri::command]
 fn import_tls_or_cert_from_path(
-    state: tauri::State<State>,
+    _state: tauri::State<State>,
     cert_path: Option<String>,
     key_path: Option<String>,
 ) -> Result<(), String> {
@@ -218,10 +217,14 @@ fn start_dav_server(state: tauri::State<State>) -> Result<(), String> {
     }
 
     let config = state.config.lock().clone();
+    println!("config: {:?}", config);
     let bind_ip: IpAddr = config
         .ip
-        .map(|s| s.parse().expect("Invalid IP address"))
-        .unwrap_or(Ipv6Addr::UNSPECIFIED.into());
+        .map(|s| {
+            s.parse::<IpAddr>()
+                .map_err(|e| format!("Invaliable Ip Address: {}", e))
+        })
+        .unwrap_or(Ok(Ipv6Addr::UNSPECIFIED.into()))?;
     let bind_port = config
         .port
         .unwrap_or_else(|| if config.enable_tls { 443 } else { 80 });
@@ -249,14 +252,29 @@ fn start_dav_server(state: tauri::State<State>) -> Result<(), String> {
         }
     }
 
+    println!("dav_server: {:?}", dav_server);
     let dav_server = dav_server.build();
 
-    let rt = tokio::runtime::Builder::new_multi_thread()
-        .enable_all()
-        .build()
-        .expect("Failed to build tokio runtime");
+    let mut rt_guard = state.tokio_runtime.lock();
+    let rt = rt_guard.get_or_insert({
+        let rt = tokio::runtime::Builder::new_current_thread()
+            .enable_all()
+            .build()
+            .expect("Failed to build tokio runtime");
+        rt
+    });
+
+    // let rt = tokio::runtime::Builder::new_multi_thread()
+    //     .enable_all()
+    //     .build()
+    //     .expect("Failed to build tokio runtime");
+
+    // let _ = rt.enter();
+
     let handle = rt.spawn(async move {
-        dav_server.run().await.expect("Failed to run dav server");
+        if let Err(err) = dav_server.run().await {
+            println!("dav server error: {}", err);
+        }
     });
     handler_guard.replace(ServerHandler { handle });
 
@@ -286,6 +304,7 @@ fn check_dav_server(state: tauri::State<State>) -> Result<DavServerStatus, Strin
     match handler_guard.as_ref() {
         Some(hander) => {
             if hander.handle.is_finished() {
+                println!("dav server is stopped");
                 Ok(DavServerStatus::Stopped)
             } else {
                 Ok(DavServerStatus::Running)
@@ -298,14 +317,31 @@ fn check_dav_server(state: tauri::State<State>) -> Result<DavServerStatus, Strin
 fn main() {
     let config = Config::default();
     let state = State {
+        tokio_runtime: Mutex::new(None),
         config: Mutex::new(config),
         server_handler: Mutex::new(None),
     };
     tauri::Builder::default()
-        // .setup(|app| {
-        //     let main = app.get_window("main").expect("main window not found");
-        //     Ok(())
-        // })
+        .setup(|app| {
+            let main = app.get_window("main").expect("main window not found");
+
+            #[cfg(target_os = "macos")]
+            {
+                use window_vibrancy::apply_vibrancy;
+                apply_vibrancy(&main, NSVisualEffectMaterial::HudWindow, None, None)
+                    .expect("Unsupported platform! 'apply_vibrancy' is only supported on macOS");
+            }
+
+            #[cfg(target_os = "windows")]
+            {
+                use window_vibrancy::apply_mica;
+                let r = apply_mica(&main, None);
+                if let Err(err) = r {
+                    eprintln!("Failed to apply mica: {:?}", err);
+                };
+            }
+            Ok(())
+        })
         .invoke_handler(tauri::generate_handler![
             get_config,
             update_config,
