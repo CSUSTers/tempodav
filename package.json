@@ -11,7 +11,7 @@
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0"
   },
   "dependencies": {
-    "@fluentui/react-components": "^9.29.2",
+    "@fluentui/react-components": "^9.29.3",
     "@fluentui/react-icons": "^2.0.211",
     "@tauri-apps/api": "^1.4.0",
     "react": "^18.2.0",
